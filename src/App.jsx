@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense, useEffect, useState } from 'react';
 import supabase from './supabaseClient';
 import './assets/tailwind.css';
 
@@ -32,6 +31,10 @@ const GuestPeminjamanAset = React.lazy(() => import('./pages/guest/peminjaman/Pe
 const Riwayat = React.lazy(() => import('./pages/guest/peminjaman/riwayat'));
 const EditProfile = React.lazy(() => import('./pages/guest/EditProfile'));
 
+// Hero Page (Landing)
+// Hero Page (Landing)
+const LandingPage = React.lazy(() => import('./landing/LandingPage'));
+
 function App() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
@@ -62,54 +65,57 @@ function App() {
   if (loading) return <div className="p-4">Loading app...</div>;
 
   return (
-    <Routes>
-      <Route path="/" element={
-        user ? (
-          role === 'admin' ? <Navigate to="/admin/dashboard" />
-            : <Navigate to="/guest/dashboard" />
-        ) : <Navigate to="/login" />
-      } />
+    <Suspense fallback={<div className="p-4">Loading page...</div>}>
+      <Routes>
+        {/* Landing page (Hero) sebagai default */}
+        <Route
+          path="/"
+          element={
+            user ? (
+              role === 'admin' ? <Navigate to="/admin/dashboard" /> :
+              <Navigate to="/guest/dashboard" />
+            ) : (
+<LandingPage />            )
+          }
+        />
 
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
-        <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
-      </Route>
-
-      {user && role === 'admin' && (
-        <Route element={<MainLayout />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-
-          <Route path="/admin/assets" element={<ListBarang />} />
-          <Route path="/admin/assets/add" element={<AddBarang />} />
-          <Route path="/admin/assets/edit/:id" element={<EditBarang />} />
-          <Route path="/admin/assets/delete/:id" element={<HapusBarang />} />
-
-
-          <Route path="/admin/Peminjaman" element={<AdminPeminjamanAset />} />
-          <Route path="/admin/Laporan" element={<Laporan />} />
-
-          <Route path="/admin/kategori" element={<Kategori />} />
-          <Route path="/admin/kategori/add" element={<AddKategori />} />  
-          <Route path="/admin/kategori/edit/:id" element={<EditKategori />} />
-
-          <Route path="/admin/kelola-user" element={<KelolaUser />} />
-
+        {/* Auth Pages */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+          <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         </Route>
-      )}
 
-      {user && role === 'guest' && (
-  <Route element={<GuestLayout />}>
-    <Route path="/guest/dashboard" element={<GuestDashboard />} />
-    <Route path="/guest/peminjaman" element={<GuestPeminjamanAset />} />
-    <Route path="/guest/riwayat" element={<Riwayat />} />
-    <Route path="/guest/edit-profile" element={<EditProfile />} />
+        {/* Admin Routes */}
+        {user && role === 'admin' && (
+          <Route element={<MainLayout />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/assets" element={<ListBarang />} />
+            <Route path="/admin/assets/add" element={<AddBarang />} />
+            <Route path="/admin/assets/edit/:id" element={<EditBarang />} />
+            <Route path="/admin/assets/delete/:id" element={<HapusBarang />} />
+            <Route path="/admin/Peminjaman" element={<AdminPeminjamanAset />} />
+            <Route path="/admin/Laporan" element={<Laporan />} />
+            <Route path="/admin/kategori" element={<Kategori />} />
+            <Route path="/admin/kategori/add" element={<AddKategori />} />
+            <Route path="/admin/kategori/edit/:id" element={<EditKategori />} />
+            <Route path="/admin/kelola-user" element={<KelolaUser />} />
+          </Route>
+        )}
 
-  </Route>
-)}
+        {/* Guest Routes */}
+        {user && role === 'guest' && (
+          <Route element={<GuestLayout />}>
+            <Route path="/guest/dashboard" element={<GuestDashboard />} />
+            <Route path="/guest/peminjaman" element={<GuestPeminjamanAset />} />
+            <Route path="/guest/riwayat" element={<Riwayat />} />
+            <Route path="/guest/edit-profile" element={<EditProfile />} />
+          </Route>
+        )}
 
-
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+        {/* Fallback untuk path yang tidak dikenal */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Suspense>
   );
 }
 
