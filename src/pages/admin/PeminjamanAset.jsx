@@ -7,7 +7,14 @@ export default function PeminjamanAsetAdmin() {
   const fetchPeminjaman = async () => {
     const { data, error } = await supabase
       .from("peminjaman")
-      .select("*, assets(nama, kategori: kategori_id(name))")
+      .select(`
+        *,
+        assets (
+          nama,
+          kategori: kategori_id (name)
+        ),
+        pengguna: id_pengguna (nama)
+      `)
       .order("tanggal_pinjam", { ascending: false });
 
     if (error) console.error("Error fetching peminjaman:", error);
@@ -20,7 +27,10 @@ export default function PeminjamanAsetAdmin() {
         ? { status, tanggal_kembali: new Date().toISOString() }
         : { status };
 
-    const { error } = await supabase.from("peminjaman").update(updateData).eq("id", id);
+    const { error } = await supabase
+      .from("peminjaman")
+      .update(updateData)
+      .eq("id", id);
     if (!error) fetchPeminjaman();
   };
 
@@ -41,8 +51,8 @@ export default function PeminjamanAsetAdmin() {
           <tr>
             <th className="px-6 py-3">Aset</th>
             <th className="px-6 py-3">Kategori</th>
+            <th className="px-6 py-3">Peminjam</th>
             <th className="px-6 py-3">Jumlah</th>
-            <th className="px-6 py-3">ID Peminjam</th>
             <th className="px-6 py-3">Status</th>
             <th className="px-6 py-3">Tanggal Pinjam</th>
             <th className="px-6 py-3">Tanggal Kembali</th>
@@ -68,8 +78,10 @@ export default function PeminjamanAsetAdmin() {
                 <td className="px-6 py-4">
                   {item.assets?.kategori?.name || "Tidak diketahui"}
                 </td>
+                <td className="px-6 py-4">
+                  {item.pengguna?.nama || "Tidak diketahui"}
+                </td>
                 <td className="px-6 py-4">{item.jumlah}</td>
-                <td className="px-6 py-4">{item.id_pengguna}</td>
                 <td className="px-6 py-4">
                   <span
                     className={`text-xs font-semibold px-2 py-1 rounded-full ${
@@ -106,7 +118,8 @@ export default function PeminjamanAsetAdmin() {
                       </button>
                     </>
                   )}
-                  {(item.status === "disetujui" || item.status === "pengembalian") && (
+                  {(item.status === "disetujui" ||
+                    item.status === "pengembalian") && (
                     <button
                       onClick={() => updateStatus(item.id, "dikembalikan")}
                       className="text-blue-600 hover:underline text-sm"
