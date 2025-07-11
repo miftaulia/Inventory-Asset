@@ -1,8 +1,8 @@
 import { useRef } from "react";
 import NavbarHero from "./NavbarHero";
 import Hero from "./Hero";
-// import About from "./About"; // Buat file ini
-// import Features from "./Features"; // Buat file ini
+import About from "./About"; // Buat file ini
+import Features from "./Features"; // Buat file ini
 // import Contact from "./Contact"; // Buat file ini
 import FooterHero from "./FooterHero";
 
@@ -18,6 +18,8 @@ export default function LandingPage() {
 
       <section ref={homeRef}>
         <Hero />
+        <About/>
+        <Features />
       </section>
       {/* <section ref={aboutRef}>
         <About />
