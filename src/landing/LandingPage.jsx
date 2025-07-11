@@ -5,7 +5,7 @@ import About from "./About"; // Buat file ini
 import Features from "./Features"; // Buat file ini
 // import Contact from "./Contact"; // Buat file ini
 import FooterHero from "./FooterHero";
-
+import { BlurFade } from "../components/magicui/blur-fade";
 export default function LandingPage() {
   const homeRef = useRef(null);
   const aboutRef = useRef(null);
@@ -16,21 +16,24 @@ export default function LandingPage() {
     <div className="bg-black text-white">
       <NavbarHero refs={{ homeRef, aboutRef, featuresRef, contactRef }} />
 
+      {/* Hero Section */}
       <section ref={homeRef}>
         <Hero />
-        <About/>
-        <Features />
       </section>
-      {/* <section ref={aboutRef}>
+
+      {/* About Section */}
+      <section ref={aboutRef}>
         <About />
       </section>
-      <section ref={featuresRef}>
-        <Features />
-      </section>
-      <section ref={contactRef}>
-        <Contact />
-      </section> */}
 
+      {/* Features Section */}
+      <BlurFade>
+        <section ref={featuresRef}>
+          <Features />
+        </section>
+      </BlurFade>
+
+      {/* Footer Section */}
       <FooterHero />
     </div>
   );

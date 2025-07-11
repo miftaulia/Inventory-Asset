@@ -6,6 +6,8 @@ import Beams from "../components/hero/Beams";
 import CurvedLoop from "../components/components1/CurvedLoop";
 import Noise from "../components/components1/Noise";
 import VariableProximity from "../components/components1/VariableProximity";
+import DecryptedText from "../components/magicui/DecryptedText.jsx";
+
 
 export default function Hero() {
   const containerRef = useRef(null);
@@ -18,7 +20,7 @@ export default function Hero() {
         patternRefreshInterval={2}
         patternAlpha={15}
       />
-      <NavbarHero />
+      {/* <NavbarHero /> */}
 
       {/* Hero Section */}
       <div style={{ width: '100%', height: '1000px', position: 'relative' }}>
@@ -67,10 +69,20 @@ export default function Hero() {
           </h1>
 
           {/* Paragraf Deskripsi */}
-          <p className="mb-6 text-gray-300 max-w-2xl text-center">
-            ASETRA hadir sebagai solusi modern untuk mengelola aset secara efisien dan terstruktur. 
-            Mulai dari pencatatan, pelacakan, hingga pelaporan — semua dalam satu platform yang mudah diakses dan terpercaya.
-          </p>
+<DecryptedText
+  text={`ASETRA hadir sebagai solusi modern untuk mengelola aset secara efisien dan terstruktur. 
+  Mulai dari pencatatan, pelacakan, hingga pelaporan — semua dalam satu 
+  platform yang mudah diakses dan terpercaya.`}
+  speed={10}
+  maxIterations={80}
+  sequential={true}
+  revealDirection="start"
+  animateOn="view"
+  className="mb-6 text-gray-300 max-w-2xl text-center text-base md:text-lg"
+  encryptedClassName="text-gray-600"
+  parentClassName="all-letters"
+/>
+
         </div>
       </div>
 
