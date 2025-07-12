@@ -1,11 +1,13 @@
 import { useRef } from "react";
 import NavbarHero from "./NavbarHero";
 import Hero from "./Hero";
-import About from "./About"; // Buat file ini
-import Features from "./Features"; // Buat file ini
-// import Contact from "./Contact"; // Buat file ini
+import About from "./About";
+import Features from "./Features";
+// import Contact from "./Contact";
 import FooterHero from "./FooterHero";
 import { BlurFade } from "../components/magicui/blur-fade";
+import LanyardWrapper from "./Lanyard"; // Gunakan wrapper agar konsisten
+
 export default function LandingPage() {
   const homeRef = useRef(null);
   const aboutRef = useRef(null);
@@ -32,6 +34,9 @@ export default function LandingPage() {
           <Features />
         </section>
       </BlurFade>
+
+      {/* Lanyard 3D Interactive Section */}
+      <LanyardWrapper />
 
       {/* Footer Section */}
       <FooterHero />

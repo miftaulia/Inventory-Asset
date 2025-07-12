@@ -67,7 +67,10 @@ export default function Features({ innerRef }) {
   return (
     <section
       ref={innerRef}
-      className="bg-black text-white py-20 px-6 md:px-12 lg:px-24 mb-40"
+       style={{
+        boxShadow: '0 10px 30px 5px rgba(0, 0, 0, 25)', // hanya bawah
+      }}
+      className="bg-black text-white py-20 px-6 md:px-12 lg:px-24 "
     >
       {/* Judul dengan DecryptedText */}
       <div className="flex justify-center text-center pb-12">
@@ -92,7 +95,7 @@ export default function Features({ innerRef }) {
         <BentoCard
           key={feature.name}
           {...feature}
-          className={`bg-[#1a1a1a] hover:scale-[1.01] transition-transform duration-300 ${feature.className}`}
+          className={`bg-[#1a1a1a00] hover:scale-[1.01] transition-transform duration-300 ${feature.className}`}
         />
       ))}
     </BentoGrid>

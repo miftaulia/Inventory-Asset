@@ -78,7 +78,7 @@ export default function Hero() {
   sequential={true}
   revealDirection="start"
   animateOn="view"
-  className="mb-6 text-gray-300 max-w-2xl text-center text-base md:text-lg"
+  className="mb-6 text-gray-300 max-w-3xl text-center text-base md:text-lg"
   encryptedClassName="text-gray-600"
   parentClassName="all-letters"
 />
@@ -87,7 +87,7 @@ export default function Hero() {
       </div>
 
       {/* Marquee */}
-      <section className="relative -mt-100 z-10">
+      <section className="relative -mt-150 z-20">
         <CurvedLoop
           marqueeText="✦ Aset ✦ Sistem ✦ Tracking ✦ ASETRA ✦ Web ✦ App ✦"
           speed={1}

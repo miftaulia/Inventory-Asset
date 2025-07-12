@@ -21,8 +21,8 @@ export default function About({ innerRef }) {
   containerClassName="text-left"
   textClassName="text-white"
   baseOpacity={0.6}
-  baseRotation={10}
-  blurStrength={8} // jangan 60, terlalu ekstrem
+  baseRotation={20}
+  blurStrength={1} // jangan 60, terlalu ekstrem
 >
   ASETRA adalah sistem manajemen aset modern yang dirancang untuk memberikan kontrol penuh, transparansi, dan efisiensi dalam pelacakan aset di berbagai organisasi.
 </ScrollReveal>
