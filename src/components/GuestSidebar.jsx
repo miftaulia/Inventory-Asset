@@ -50,25 +50,25 @@ export default function GuestSidebar() {
         <p className="text-gray-400 uppercase text-xs font-semibold mb-2">Main</p>
         <nav className="space-y-1 mb-4">
           <SidebarItem icon={<LayoutDashboard size={16} />} label="Dashboard" to="/guest/dashboard" />
-          <SidebarItem icon={<Settings size={16} />} label="Edit Profile" to="/guest/edit-profile" />
         </nav>
 
         <p className="text-gray-400 uppercase text-xs font-semibold mb-2">Inventory</p>
         <nav className="space-y-1 mb-4">
+          <SidebarItem icon={<Archive size={16} />} label="peminjaman" to="/guest/peminjaman" />
           <SidebarItem icon={<Package size={16} />} label="Riwayat" to="/guest/riwayat" />
-          <SidebarItem icon={<Archive size={16} />} label="Low Stocks" to="/guest/low-stock" />
-          <SidebarItem icon={<Layers size={16} />} label="Category" to="/guest/category" />
+          <SidebarItem icon={<Settings size={16} />} label="Edit Profile" to="/guest/edit-profile" />
+          {/* <SidebarItem icon={<Layers size={16} />} label="Category" to="/guest/category" />
           <SidebarItem icon={<Boxes size={16} />} label="Brands" to="/guest/brands" />
           <SidebarItem icon={<Barcode size={16} />} label="Print Barcode" to="/guest/print-barcode" />
-          <SidebarItem icon={<QrCode size={16} />} label="Print QR Code" to="/guest/print-qr" />
+          <SidebarItem icon={<QrCode size={16} />} label="Print QR Code" to="/guest/print-qr" /> */}
         </nav>
 
-        <p className="text-gray-400 uppercase text-xs font-semibold mb-2">Stock</p>
+        {/* <p className="text-gray-400 uppercase text-xs font-semibold mb-2">Stock</p>
         <nav className="space-y-1">
           <SidebarItem icon={<Package size={16} />} label="Manage Stock" to="/guest/stock/manage" />
           <SidebarItem icon={<Settings size={16} />} label="Stock Adjustment" to="/guest/stock/adjustment" />
           <SidebarItem icon={<Settings size={16} />} label="Stock Transfer" to="/guest/stock/transfer" />
-        </nav>
+        </nav> */}
       </div>
 
       <div className="p-4">

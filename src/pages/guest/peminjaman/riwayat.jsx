@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import supabase from "../../../supabaseClient";
+import HeaderGuest from "../../guest/HeaderGuest.jsx";
 
 export default function RiwayatPeminjaman() {
   const [riwayat, setRiwayat] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchRiwayat = async () => {
     const user = (await supabase.auth.getUser()).data.user;
@@ -31,13 +33,37 @@ export default function RiwayatPeminjaman() {
     }
   };
 
+  const hapusPeminjaman = async (id) => {
+    const konfirmasi = confirm("Yakin ingin menghapus peminjaman ini?");
+    if (!konfirmasi) return;
+
+    const { error } = await supabase.from("peminjaman").delete().eq("id", id);
+
+    if (error) {
+      console.error("Gagal menghapus:", error.message);
+      setMessage("❌ Gagal menghapus: " + error.message);
+    } else {
+      setMessage("🗑️ Data berhasil dihapus.");
+      fetchRiwayat();
+    }
+  };
+
   useEffect(() => {
     fetchRiwayat();
   }, []);
 
+  const filteredRiwayat = riwayat.filter((item) =>
+    item.assets?.nama?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen text-gray-800">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">📦 Riwayat Peminjaman Saya</h1>
+      <HeaderGuest
+        title="📦 Riwayat Peminjaman Saya"
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        message={message}
+      />
 
       {message && (
         <div className="mb-4 p-4 text-sm text-green-800 rounded-lg bg-green-100 border border-green-300">
@@ -47,7 +73,7 @@ export default function RiwayatPeminjaman() {
 
       {loading ? (
         <p>Loading riwayat...</p>
-      ) : riwayat.length === 0 ? (
+      ) : filteredRiwayat.length === 0 ? (
         <p className="text-gray-500">Belum ada riwayat peminjaman.</p>
       ) : (
         <div className="overflow-x-auto relative bg-white p-6 rounded-xl shadow-md">
@@ -64,7 +90,7 @@ export default function RiwayatPeminjaman() {
               </tr>
             </thead>
             <tbody>
-              {riwayat.map((item) => (
+              {filteredRiwayat.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-4 py-2">{item.assets?.nama || "-"}</td>
                   <td className="px-4 py-2">{item.assets?.kategori?.name || "-"}</td>
@@ -94,13 +120,21 @@ export default function RiwayatPeminjaman() {
                       ? new Date(item.tanggal_kembali).toLocaleString()
                       : "-"}
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-center space-y-1">
                     {item.status === "disetujui" && (
                       <button
                         onClick={() => ajukanPengembalian(item.id)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-1.5 rounded"
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-1.5 rounded block w-full"
                       >
                         Ajukan Pengembalian
+                      </button>
+                    )}
+                    {(item.status === "ditolak" || item.status === "dikembalikan") && (
+                      <button
+                        onClick={() => hapusPeminjaman(item.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1.5 rounded block w-full"
+                      >
+                        Hapus
                       </button>
                     )}
                   </td>

@@ -1,7 +1,7 @@
 import LanyardGroup from "../components/magicui/LanyardGroup";
 import lanyardTexture1 from "../assets/lanyard.png";
 
-const cardImage1 = "/img/ANANTA FIRDAUS (3).png";
+const cardImage1 = "/img/logo-asetra-putih.png";
 const cardImage2 = "/img/logo-nanta.png";
 const cardImage3 = "/img/logo-asetra-putih.png";
 
@@ -12,8 +12,9 @@ const lanyards = [
 ];
 
 
-export default function ContactWithLanyard() {
+export default function ContactWithLanyard(innerRef) {
   return (
+    
     <section className="bg-[#eeeeee] min-h-screen flex flex-col lg:flex-row items-center justify-center gap-12 p-8">
       <div className="w-full lg:w-1/2 -mt-90 z-50">
         <LanyardGroup items={lanyards} />

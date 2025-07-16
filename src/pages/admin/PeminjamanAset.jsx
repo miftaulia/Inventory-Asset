@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import supabase from "../../supabaseClient";
+import HeaderAdmin from "./HeaderAdmin.jsx";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
 
 export default function PeminjamanAsetAdmin() {
   const [peminjaman, setPeminjaman] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""); // Tambahan untuk search
+  const itemsPerPage = 6;
 
   const fetchPeminjaman = async () => {
     const { data, error } = await supabase
@@ -31,6 +37,7 @@ export default function PeminjamanAsetAdmin() {
       .from("peminjaman")
       .update(updateData)
       .eq("id", id);
+
     if (!error) fetchPeminjaman();
   };
 
@@ -41,11 +48,33 @@ export default function PeminjamanAsetAdmin() {
     fetchPeminjaman();
   }, []);
 
+  // Filter berdasarkan searchTerm
+  const filteredData = peminjaman.filter((item) => {
+    const aset = item.assets?.nama?.toLowerCase() || "";
+    const kategori = item.assets?.kategori?.name?.toLowerCase() || "";
+    const peminjam = item.pengguna?.nama?.toLowerCase() || "";
+    const keyword = searchTerm.toLowerCase();
+    return (
+      aset.includes(keyword) ||
+      kategori.includes(keyword) ||
+      peminjam.includes(keyword)
+    );
+  });
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg p-6 bg-white">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        Manajemen Peminjaman Aset
-      </h2>
+    <div className="relative overflow-x-auto shadow-md text-black sm:rounded-lg p-6 bg-white">
+      <HeaderAdmin
+        title="📦 Manajemen Peminjaman Aset"
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
+
       <table className="w-full text-sm text-left text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
@@ -60,14 +89,14 @@ export default function PeminjamanAsetAdmin() {
           </tr>
         </thead>
         <tbody>
-          {peminjaman.length === 0 ? (
+          {paginatedData.length === 0 ? (
             <tr>
               <td colSpan={8} className="text-center px-6 py-4 text-gray-500">
                 Tidak ada data peminjaman.
               </td>
             </tr>
           ) : (
-            peminjaman.map((item) => (
+            paginatedData.map((item) => (
               <tr
                 key={item.id}
                 className="odd:bg-white even:bg-gray-50 border-b border-gray-200"
@@ -99,8 +128,12 @@ export default function PeminjamanAsetAdmin() {
                     {item.status}
                   </span>
                 </td>
-                <td className="px-6 py-4">{formatTanggal(item.tanggal_pinjam)}</td>
-                <td className="px-6 py-4">{formatTanggal(item.tanggal_kembali)}</td>
+                <td className="px-6 py-4">
+                  {formatTanggal(item.tanggal_pinjam)}
+                </td>
+                <td className="px-6 py-4">
+                  {formatTanggal(item.tanggal_kembali)}
+                </td>
                 <td className="px-6 py-4 space-x-2">
                   {item.status === "menunggu" && (
                     <>
@@ -140,6 +173,21 @@ export default function PeminjamanAsetAdmin() {
           )}
         </tbody>
       </table>
+
+      {/* Pagination with MUI */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center">
+          <Stack spacing={2}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={(event, value) => setCurrentPage(value)}
+              variant="outlined"
+              color="primary"
+            />
+          </Stack>
+        </div>
+      )}
     </div>
   );
 }
