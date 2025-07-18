@@ -3,10 +3,11 @@ import NavbarHero from "./NavbarHero";
 import Hero from "./Hero";
 import About from "./About";
 import Features from "./Features";
-// import Contact from "./Contact";
+import ContactWithLanyard from "./Lanyard";
 import FooterHero from "./FooterHero";
 import { BlurFade } from "../components/magicui/blur-fade";
-import LanyardWrapper from "./Lanyard"; // Gunakan wrapper agar konsisten
+import AnimatedContent from "../components/components1/AnimatedContent";
+import CurvedLoop from "../components/components1/CurvedLoop";
 
 export default function LandingPage() {
   const homeRef = useRef(null);
@@ -15,12 +16,26 @@ export default function LandingPage() {
   const contactRef = useRef(null);
 
   return (
-    <div className="bg-black text-white">
+    <div className="bg-black text-white relative z-0 overflow-x-hidden">
+      {/* Navbar */}
       <NavbarHero refs={{ homeRef, aboutRef, featuresRef, contactRef }} />
 
       {/* Hero Section */}
       <section ref={homeRef}>
         <Hero />
+      </section>
+
+      {/* CurvedLoop + Gradien Pemisah */}
+      <section className="relative -mt-100 z-20">
+        <CurvedLoop
+          marqueeText="✦ Aset ✦ Sistem ✦ Tracking ✦ ASETRA ✦ Web ✦ App ✦"
+          speed={1}
+          curveAmount={200}
+          direction="right"
+          interactive={true}
+          className="custom-text-style"
+        />
+        <div className="absolute bottom-95 w-full h-48 bg-gradient-to-b from-black via-transparent to-transparent z-10" />
       </section>
 
       {/* About Section */}
@@ -31,14 +46,18 @@ export default function LandingPage() {
       {/* Features Section */}
       <BlurFade>
         <section ref={featuresRef}>
-          <Features />
+          <AnimatedContent distance={100} duration={1.3} delay={0.4}>
+            <Features />
+          </AnimatedContent>
         </section>
       </BlurFade>
 
-      {/* Lanyard 3D Interactive Section */}
-      <LanyardWrapper />
+      {/* Contact Section with Lanyard */}
+      <section ref={contactRef} className="relative z-10">
+        <ContactWithLanyard />
+      </section>
 
-      {/* Footer Section */}
+      {/* Footer */}
       <FooterHero />
     </div>
   );

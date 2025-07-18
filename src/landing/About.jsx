@@ -1,10 +1,18 @@
 import ScrollReveal from "../components/magicui/text-reveal.jsx";
+import Noise from "../components/components1/Noise.jsx";
 export default function About({ innerRef }) {
   return (
     <section
       ref={innerRef}
-      className="bg-black text-white min-h-screen flex items-center justify-center px-6 lg:px-24"
+      className="bg-black text-white min-h-screen flex items-center justify-center px-6 lg:px-24 bg-gradient-to-t from-black via-transparent to-transparent"
     >
+    <Noise
+        patternSize={250}
+        patternScaleX={1}
+        patternScaleY={1}
+        patternRefreshInterval={2}
+        patternAlpha={15}
+      />
       <div className="flex flex-col lg:flex-row items-center gap-16 max-w-7xl w-full">
         {/* Gambar kiri */}
         <div className="w-full lg:w-1/2 flex justify-center">
