@@ -3,7 +3,7 @@ import lanyardTexture1 from "../assets/lanyard.png";
 import Noise from "../components/components1/Noise";
 
 const cardImage1 = "/img/logo-asetra-putih.png";
-const cardImage2 = "/img/logo-nanta.png";
+const cardImage2 = "/img/ANANTA FIRDAUS (3).png";
 const cardImage3 = "/img/logo-asetra-putih.png";
 
 const lanyards = [
