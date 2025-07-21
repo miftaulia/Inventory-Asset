@@ -2,9 +2,9 @@ import LanyardGroup from "../components/magicui/LanyardGroup";
 import lanyardTexture1 from "../assets/lanyard.png";
 import Noise from "../components/components1/Noise";
 
-const cardImage1 = "/img/logo-asetra-putih.png";
-const cardImage2 = "/img/ANANTA FIRDAUS (3).png";
-const cardImage3 = "/img/logo-asetra-putih.png";
+const cardImage1 = "/img/ANANTA FIRDAUS (3).png";
+const cardImage2 = "/img/mifta1.png";
+const cardImage3 = "/img/izazier1.png";
 
 const lanyards = [
   { cardImage: cardImage1, lanyardTexture: lanyardTexture1, position: [-3, 2, 0] },
