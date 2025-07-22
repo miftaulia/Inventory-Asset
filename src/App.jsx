@@ -24,6 +24,7 @@ const Kategori = React.lazy(() => import('./pages/admin/kategori/Kategori'));
 const AddKategori = React.lazy(() => import('./pages/admin/kategori/AddKategori'));
 const EditKategori = React.lazy(() => import('./pages/admin/kategori/EditKategori'));
 const KelolaUser = React.lazy(() => import('./pages/admin/kelolaUser'));
+const EditProfileAdmin = React.lazy(() => import('./pages/admin/EditProfile'));
 
 // Guest Pages
 const GuestDashboard = React.lazy(() => import('./pages/guest/Dashboard'));
@@ -99,6 +100,8 @@ function App() {
             <Route path="/admin/kategori/add" element={<AddKategori />} />
             <Route path="/admin/kategori/edit/:id" element={<EditKategori />} />
             <Route path="/admin/kelola-user" element={<KelolaUser />} />
+            <Route path="/admin/EditProfile" element={<EditProfileAdmin />} />
+
           </Route>
         )}
 

@@ -4,46 +4,87 @@ import { ImSpinner2 } from 'react-icons/im';
 import { BsFillExclamationDiamondFill } from 'react-icons/bs';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import supabase from '../../supabaseClient';
-
 export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
+      // 1. Login dengan Supabase Auth
+      const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
-
       if (loginError) {
         setError(loginError.message);
-      } else {
-        const { user } = data;
-        const role = user.user_metadata?.role;
-
-        if (role === 'admin') {
-          navigate('/admin/dashboard');
-        } else if (role === 'guest') {
-          navigate('/guest/dashboard');
-        } else {
-          setError('Role tidak dikenali.');
+        setLoading(false);
+        return;
+      }
+      const { user } = authData;
+      // 2. Ambil role terbaru dari database users
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role, aktif, nama')
+        .eq('email', user.email)
+        .single();
+      if (userError) {
+        console.error('Error fetching user data:', userError);
+        setError('Gagal mengambil data pengguna');
+        setLoading(false);
+        return;
+      }
+      // 3. Periksa apakah user aktif
+      if (!userData.aktif) {
+        setError('Akun Anda tidak aktif. Silakan hubungi administrator.');
+        await supabase.auth.signOut(); // Logout jika tidak aktif
+        setLoading(false);
+        return;
+      }
+      // 4. Sinkronisasi role di auth metadata dengan role di database
+      const currentRole = user.user_metadata?.role;
+      const dbRole = userData.role;
+      if (currentRole !== dbRole) {
+        // Update user metadata dengan role terbaru dari database
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { 
+            role: dbRole,
+            nama: userData.nama 
+          }
+        });
+        if (updateError) {
+          console.error('Error updating user metadata:', updateError);
+          // Lanjutkan login meski gagal update metadata
         }
       }
-    } catch {
+      // 5. Redirect berdasarkan role yang benar dari database
+      const finalRole = dbRole || currentRole;
+      switch (finalRole) {
+        case 'admin':
+          navigate('/admin/dashboard');
+          break;
+        case 'moderator':
+          navigate('/moderator/dashboard');
+          break;
+        case 'guest':
+          navigate('/guest/dashboard');
+          break;
+        default:
+          setError('Role tidak dikenali: ' + finalRole);
+          await supabase.auth.signOut();
+          break;
+      }
+        } catch (error) {
+      console.error('Login error:', error);
       setError('Terjadi kesalahan saat login.');
     } finally {
       setLoading(false);
@@ -51,94 +92,60 @@ export default function Login() {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 dark:from-gray-900 dark:to-black px-4">
-      <div className="w-full max-w-lg bg-white/20 dark:bg-white/10 backdrop-blur-xl border border-white/30 rounded-2xl shadow-xl p-8 sm:p-10 md:p-12 transition-all duration-500">
-        <h2 className="text-4xl font-bold text-center text-white mb-8 drop-shadow">
-          Welcome Back 👋
-        </h2>
-
-        {/* Error Message */}
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         {error && (
-          <div className="flex items-center text-red-500 text-sm bg-red-100/80 dark:bg-red-500/10 rounded p-3 mb-4 shadow">
-            <BsFillExclamationDiamondFill className="mr-2" />
-            {error}
+          <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 flex items-center gap-2">
+            <BsFillExclamationDiamondFill /> {error}
           </div>
         )}
-
-        {/* Loading Spinner */}
-        {loading && (
-          <div className="flex items-center text-blue-600 text-sm bg-blue-100/80 dark:bg-blue-500/10 rounded p-3 mb-4 shadow">
-            <ImSpinner2 className="mr-2 animate-spin" />
-            Memproses login...
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email"
+              required
+              className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email */}
-          <div>
-            <label className="block text-sm text-white font-medium mb-1">Email Address</label>
-            <div className="relative">
-              <span className="absolute left-3 top-2.5 text-white/60">
-                <FaEnvelope />
-              </span>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full py-2 pl-10 pr-4 bg-white/10 dark:bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                placeholder="you@example.com"
-                required
-              />
-            </div>
+          <div className="relative">
+            <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Password"
+              required
+              className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-sm text-white font-medium mb-1">Password</label>
-            <div className="relative">
-              <span className="absolute left-3 top-2.5 text-white/60">
-                <FaLock />
-              </span>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full py-2 pl-10 pr-4 bg-white/30 dark:bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                placeholder="********"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Forgot Password */}
-          <div className="text-right">
-            <Link to="/forgot" className="text-sm text-white/70 hover:text-white hover:underline transition">
-              Forgot Password?
-            </Link>
-          </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-transform transform hover:scale-105 shadow-lg"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded flex justify-center items-center"
           >
-            {loading ? 'Loading...' : 'Log In'}
+            {loading ? (
+              <>
+                <ImSpinner2 className="animate-spin mr-2" /> Logging in...
+              </>
+            ) : (
+              'Login'
+            )}
           </button>
         </form>
-
-        {/* Register Link */}
-        <div className="mt-6 text-center text-sm text-white/80">
-          <p>
-            Don't have an account?{' '}
-            <Link to="/register" className="text-indigo-200 hover:underline">
-              Register
-            </Link>
-          </p>
-        </div>
+        <p className="mt-4 text-center text-sm">
+          Belum punya akun?{' '}
+          <Link to="/register" className="text-blue-600 hover:underline">
+            Daftar di sini
+          </Link>
+        </p>
       </div>
-    </section>
+    </div>
   );
 }
