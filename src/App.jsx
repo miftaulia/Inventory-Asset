@@ -112,6 +112,7 @@ function App() {
             <Route path="/guest/peminjaman" element={<GuestPeminjamanAset />} />
             <Route path="/guest/riwayat" element={<Riwayat />} />
             <Route path="/guest/edit-profile" element={<EditProfile />} />
+            
           </Route>
         )}
 

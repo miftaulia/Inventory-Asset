@@ -94,14 +94,14 @@ export default function PeminjamanAset() {
                     ${
                       currentPage === 1
                         ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+                        : "bg-blue-900 hover:bg-orange-600 text-white shadow-md"
                     }`}
                 >
                   <FaChevronLeft className="mr-2" />
                   Previous
                 </button>
                 <span className="text-md text-gray-700 font-medium">
-                  Halaman {currentPage} dari {totalPages}
+                  Page {currentPage} from {totalPages}
                 </span>
                 <button
                   disabled={currentPage === totalPages}
@@ -110,7 +110,7 @@ export default function PeminjamanAset() {
                     ${
                       currentPage === totalPages
                         ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+                        : "bg-blue-900 hover:bg-orange-600 text-white shadow-md"
                     }`}
                 >
                   Next

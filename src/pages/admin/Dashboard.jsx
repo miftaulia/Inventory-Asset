@@ -152,7 +152,7 @@ export default function AdminDashboard() {
       >
         <PolarGrid />
         <PolarAngleAxis dataKey="subject" />
-        <Radar name="Jumlah" dataKey="A" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
+        <Radar name="Jumlah" dataKey="A" stroke="#ff5003" fill="#fd7702" fillOpacity={0.6} />
       </RadarChart>
     </ResponsiveContainer>
   </div>
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
         <XAxis dataKey="name" />
         <YAxis allowDecimals={false} />
         <Tooltip />
-        <Bar dataKey="jumlah" fill="#6366f1" radius={[6, 6, 0, 0]} />
+        <Bar dataKey="jumlah" fill="#003f7d" radius={[6, 6, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   </div>

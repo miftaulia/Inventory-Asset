@@ -10,7 +10,6 @@ export default function RiwayatPeminjaman() {
 
   const fetchRiwayat = async () => {
     const user = (await supabase.auth.getUser()).data.user;
-
     const { data, error } = await supabase
       .from("peminjaman")
       .select("*, assets(nama, kategori: kategori_id(name))")
@@ -57,7 +56,7 @@ export default function RiwayatPeminjaman() {
   );
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen text-gray-800">
+    <div className="p-6 bg-[#F9FAFC] min-h-screen text-gray-800 font-sans">
       <HeaderGuest
         title="📦 Riwayat Peminjaman Saya"
         searchTerm={searchTerm}
@@ -66,7 +65,7 @@ export default function RiwayatPeminjaman() {
       />
 
       {message && (
-        <div className="mb-4 p-4 text-sm text-green-800 rounded-lg bg-green-100 border border-green-300">
+        <div className="mb-4 p-4 text-sm text-green-800 rounded-md bg-green-100 border border-green-300 shadow-sm">
           {message}
         </div>
       )}
@@ -76,28 +75,33 @@ export default function RiwayatPeminjaman() {
       ) : filteredRiwayat.length === 0 ? (
         <p className="text-gray-500">Belum ada riwayat peminjaman.</p>
       ) : (
-        <div className="overflow-x-auto relative bg-white p-6 rounded-xl shadow-md">
-          <table className="w-full text-sm text-left text-gray-500 border border-gray-200">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+        <div className="overflow-x-auto bg-white p-6 rounded-2xl shadow-md">
+          <table className="w-full text-sm text-left text-gray-700">
+            <thead className="text-xs uppercase bg-[#FF8E00]/10 text-orange-700">
               <tr>
-                <th className="px-4 py-2">Nama Aset</th>
-                <th className="px-4 py-2">Kategori</th>
-                <th className="px-4 py-2 text-center">Jumlah</th>
-                <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2">Tanggal Pinjam</th>
-                <th className="px-4 py-2">Tanggal Kembali</th>
-                <th className="px-4 py-2 text-center">Aksi</th>
+                <th className="px-4 py-3">Nama Aset</th>
+                <th className="px-4 py-3">Kategori</th>
+                <th className="px-4 py-3 text-center">Jumlah</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Tgl Pinjam</th>
+                <th className="px-4 py-3">Tgl Kembali</th>
+                <th className="px-4 py-3 text-center">Aksi</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200">
               {filteredRiwayat.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2">{item.assets?.nama || "-"}</td>
-                  <td className="px-4 py-2">{item.assets?.kategori?.name || "-"}</td>
-                  <td className="px-4 py-2 text-center">{item.jumlah}</td>
-                  <td className="px-4 py-2">
+                <tr
+                  key={item.id}
+                  className="hover:bg-orange-50 transition-colors"
+                >
+                  <td className="px-4 py-3 font-medium">
+                    {item.assets?.nama || "-"}
+                  </td>
+                  <td className="px-4 py-3">{item.assets?.kategori?.name || "-"}</td>
+                  <td className="px-4 py-3 text-center">{item.jumlah}</td>
+                  <td className="px-4 py-3">
                     <span
-                      className={`inline-block px-2 py-1 text-xs font-medium rounded-full text-white ${
+                      className={`px-2 py-1 text-xs rounded-full font-semibold text-white shadow-sm ${
                         item.status === "menunggu"
                           ? "bg-yellow-500"
                           : item.status === "disetujui"
@@ -112,27 +116,28 @@ export default function RiwayatPeminjaman() {
                       {item.status}
                     </span>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-3">
                     {new Date(item.tanggal_pinjam).toLocaleString()}
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-3">
                     {item.tanggal_kembali
                       ? new Date(item.tanggal_kembali).toLocaleString()
                       : "-"}
                   </td>
-                  <td className="px-4 py-2 text-center space-y-1">
+                 <td className="px-4 py-2 text-center space-y-1">
                     {item.status === "disetujui" && (
                       <button
                         onClick={() => ajukanPengembalian(item.id)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-1.5 rounded block w-full"
+                        className="bg-blue-900 hover:bg-blue-700 text-white text-xs px-4 py-1.5 rounded-lg block w-full"
                       >
                         Ajukan Pengembalian
                       </button>
                     )}
-                    {(item.status === "ditolak" || item.status === "dikembalikan") && (
+                    {(item.status === "ditolak" ||
+                      item.status === "dikembalikan") && (
                       <button
                         onClick={() => hapusPeminjaman(item.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1.5 rounded block w-full"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded-lg transition"
                       >
                         Hapus
                       </button>

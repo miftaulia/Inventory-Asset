@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import supabase from "../../supabaseClient";
-import { PieChart, Pie, Tooltip } from "recharts";
+import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from "recharts";
 import HeaderGuest from "../guest/HeaderGuest.jsx";
+import { Loader2, PackageOpen, History } from "lucide-react";
 
 export default function GuestDashboard() {
   const [assets, setAssets] = useState([]);
@@ -39,21 +40,20 @@ export default function GuestDashboard() {
         setRiwayat(data);
         setLoadingRiwayat(false);
 
-        const validDipinjam = data.filter(
+        const valid = data.filter(
           (item) => item.status === "disetujui" || item.status === "dikembalikan"
         );
 
-        const totalDipinjam = validDipinjam.reduce((sum, item) => sum + item.jumlah, 0);
-        const totalKembali = validDipinjam.reduce(
+        const totalDipinjam = valid.reduce((sum, item) => sum + item.jumlah, 0);
+        const totalKembali = valid.reduce(
           (sum, item) => sum + (item.tanggal_kembali ? item.jumlah : 0),
           0
         );
-        const totalBelumKembali = totalDipinjam - totalKembali;
 
         setStats({
           totalDipinjam,
           totalKembali,
-          totalBelumKembali,
+          totalBelumKembali: totalDipinjam - totalKembali,
           statusCount: {
             menunggu: data.filter((i) => i.status === "menunggu").length,
             disetujui: data.filter((i) => i.status === "disetujui").length,
@@ -81,113 +81,125 @@ export default function GuestDashboard() {
     }
   };
 
-  const statusPieData = [
-    {
-      name: "Menunggu",
-      value: riwayat.filter((item) => item.status === "menunggu").length,
-      fill: "#facc15",
-    },
-    {
-      name: "Disetujui",
-      value: riwayat.filter((item) => item.status === "disetujui").length,
-      fill: "#22c55e",
-    },
-    {
-      name: "Ditolak",
-      value: riwayat.filter((item) => item.status === "ditolak").length,
-      fill: "#ef4444",
-    },
-    {
-      name: "Dikembalikan",
-      value: riwayat.filter((item) => item.status === "dikembalikan").length,
-      fill: "#3b82f6",
-    },
-  ];
-
-  const filteredAssets = assets.filter((asset) =>
-    asset.nama.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAssets = assets.filter((a) =>
+    a.nama.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const COLORS = ["#FBBF24", "#22C55E", "#EF4444", "#3B82F6"];
+
+  const statusPieData = [
+    { name: "Menunggu", value: stats?.statusCount.menunggu || 0 },
+    { name: "Disetujui", value: stats?.statusCount.disetujui || 0 },
+    { name: "Ditolak", value: stats?.statusCount.ditolak || 0 },
+    { name: "Dikembalikan", value: stats?.statusCount.dikembalikan || 0 },
+  ];
+
   return (
-    <div className="p-6 bg-gray-100 min-h-screen text-gray-800">
+    <div className="bg-gradient-to-br from-[#F9FAFB] to-[#F3F4F6] min-h-screen px-6 py-8 text-gray-800">
       <HeaderGuest
-        title="📊 Dashboard Guest"
+        title="📊 Dashboard"
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         message={message}
-      >
-        
-      </HeaderGuest>
+      />
 
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-xl shadow text-center">
-            <h4 className="text-sm text-gray-500 mb-1">Total Dipinjam</h4>
-            <p className="text-2xl font-bold text-blue-600">{stats.totalDipinjam}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl shadow text-center">
-            <h4 className="text-sm text-gray-500 mb-1">Sudah Dikembalikan</h4>
-            <p className="text-2xl font-bold text-green-600">{stats.totalKembali}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl shadow text-center">
-            <h4 className="text-sm text-gray-500 mb-1">Belum Dikembalikan</h4>
-            <p className="text-2xl font-bold text-red-500">{stats.totalBelumKembali}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl shadow flex flex-col items-center justify-center">
-            <h4 className="text-sm text-gray-500 mb-2">Status Peminjaman</h4>
-            <PieChart width={160} height={160}>
-              <Pie
-                dataKey="value"
-                data={statusPieData}
-                cx="50%"
-                cy="50%"
-                outerRadius={55}
-                label
-              />
-              <Tooltip />
-            </PieChart>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+          {[
+            {
+              title: "Total Dipinjam",
+              icon: <PackageOpen size={20} />,
+              color: "bg-orange-100 text-orange-600",
+              value: stats.totalDipinjam,
+            },
+            {
+              title: "Sudah Dikembalikan",
+              icon: <PackageOpen size={20} />,
+              color: "bg-green-100 text-green-600",
+              value: stats.totalKembali,
+            },
+            {
+              title: "Belum Dikembalikan",
+              icon: <PackageOpen size={20} />,
+              color: "bg-red-100 text-red-600",
+              value: stats.totalBelumKembali,
+            },
+            {
+              title: "Status Peminjaman",
+              icon: <History size={20} />,
+              color: "bg-blue-100 text-blue-600",
+              isChart: true,
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className={`p-4 rounded-xl shadow-sm border border-gray-200 ${
+                item.color
+              } flex flex-col items-center justify-center`}
+            >
+              <div className="mb-2">{item.icon}</div>
+              <h4 className="text-sm mb-1 font-medium text-center">{item.title}</h4>
+              {item.isChart ? (
+                <ResponsiveContainer width="100%" height={120}>
+                  <PieChart>
+                    <Pie
+                      data={statusPieData}
+                      dataKey="value"
+                      outerRadius={40}
+                      innerRadius={25}
+                      label
+                    >
+                      {statusPieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-2xl font-bold">{item.value}</p>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Daftar Aset */}
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold text-blue-600 mb-4">Daftar Aset Tersedia</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Aset Section */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+          <h2 className="text-xl font-bold text-orange-600 mb-4">📦 Daftar Aset</h2>
 
           {successMessage && (
-            <div className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-100">
+            <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded-md shadow-sm">
               {successMessage}
             </div>
           )}
 
           {loadingAssets ? (
-            <p>Loading aset...</p>
+            <div className="text-center py-10">
+              <Loader2 className="animate-spin mx-auto text-gray-400" />
+              <p className="text-sm text-gray-500 mt-2">Loading data aset...</p>
+            </div>
           ) : (
-            <div className="overflow-x-auto relative">
-              <table className="w-full text-sm text-left text-gray-500 border border-gray-200">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-100 text-gray-600 text-xs uppercase">
                   <tr>
                     <th className="px-4 py-2">Nama</th>
                     <th className="px-4 py-2">Kategori</th>
                     <th className="px-4 py-2 text-center">Tersedia</th>
-                    {/* <th className="px-4 py-2 text-center">Aksi</th> */}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAssets.map((asset) => (
-                    <tr key={asset.id} className="hover:bg-gray-50">
+                    <tr
+                      key={asset.id}
+                      className="hover:bg-orange-50 transition-all duration-150 cursor-pointer"
+                      onClick={() => setSelectedAsset(asset)}
+                    >
                       <td className="px-4 py-2">{asset.nama}</td>
                       <td className="px-4 py-2">{asset.kategori?.name || "-"}</td>
                       <td className="px-4 py-2 text-center">{asset.jumlah}</td>
-                      {/* <td className="px-4 py-2 text-center">
-                        <button
-                          onClick={() => setSelectedAsset(asset)}
-                          className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5"
-                        >
-                          Pinjam
-                        </button>
-                      </td> */}
                     </tr>
                   ))}
                 </tbody>
@@ -196,33 +208,31 @@ export default function GuestDashboard() {
           )}
 
           {selectedAsset && (
-            <div className="mt-6 p-6 bg-blue-50 border border-blue-300 rounded-lg">
-              <h3 className="text-lg font-semibold mb-3">
-                Ajukan Peminjaman: {selectedAsset.nama}
-              </h3>
-              <div className="mb-4">
-                <label className="block mb-1">Jumlah</label>
-                <input
-                  type="number"
-                  min="1"
-                  max={selectedAsset.jumlah}
-                  value={jumlah}
-                  onChange={(e) =>
-                    setJumlah(Math.min(Number(e.target.value), selectedAsset.jumlah))
-                  }
-                  className="w-24 px-3 py-2 border rounded-md text-sm"
-                />
-              </div>
-              <div className="space-x-3">
+            <div className="mt-6 bg-orange-50 p-5 rounded-lg border border-orange-200">
+              <h4 className="text-md font-semibold mb-2">
+                Ajukan Peminjaman:{" "}
+                <span className="text-orange-600">{selectedAsset.nama}</span>
+              </h4>
+              <input
+                type="number"
+                min="1"
+                max={selectedAsset.jumlah}
+                value={jumlah}
+                onChange={(e) =>
+                  setJumlah(Math.min(Number(e.target.value), selectedAsset.jumlah))
+                }
+                className="w-24 px-3 py-2 border border-gray-300 rounded-md text-sm mb-3"
+              />
+              <div className="space-x-2">
                 <button
                   onClick={handlePeminjaman}
-                  className="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5"
+                  className="bg-orange-600 text-white text-sm px-5 py-2 rounded-md hover:bg-orange-700"
                 >
                   Kirim
                 </button>
                 <button
                   onClick={() => setSelectedAsset(null)}
-                  className="text-gray-800 bg-gray-200 hover:bg-gray-300 font-medium rounded-lg text-sm px-5 py-2.5"
+                  className="bg-gray-200 text-sm px-5 py-2 rounded-md hover:bg-gray-300"
                 >
                   Batal
                 </button>
@@ -231,33 +241,36 @@ export default function GuestDashboard() {
           )}
         </div>
 
-        {/* Riwayat Peminjaman */}
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold text-blue-600 mb-4">Riwayat Peminjaman</h2>
+        {/* Riwayat */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+          <h2 className="text-xl font-bold text-orange-600 mb-4">📝 Riwayat Peminjaman</h2>
 
           {loadingRiwayat ? (
-            <p>Loading riwayat...</p>
+            <div className="text-center py-10">
+              <Loader2 className="animate-spin mx-auto text-gray-400" />
+              <p className="text-sm text-gray-500 mt-2">Loading riwayat...</p>
+            </div>
           ) : riwayat.length === 0 ? (
             <p className="text-gray-500">Belum ada riwayat peminjaman.</p>
           ) : (
-            <div className="overflow-x-auto relative">
-              <table className="w-full text-sm text-left text-gray-500 border border-gray-200">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-100 text-gray-600 text-xs uppercase">
                   <tr>
                     <th className="px-4 py-2">Nama Aset</th>
                     <th className="px-4 py-2">Kategori</th>
                     <th className="px-4 py-2">Jumlah</th>
                     <th className="px-4 py-2">Status</th>
-                    <th className="px-4 py-2">Tanggal Pinjam</th>
-                    <th className="px-4 py-2">Tanggal Kembali</th>
+                    <th className="px-4 py-2">Tgl Pinjam</th>
+                    <th className="px-4 py-2">Tgl Kembali</th>
                   </tr>
                 </thead>
                 <tbody>
                   {riwayat.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
+                    <tr key={item.id} className="hover:bg-orange-50">
                       <td className="px-4 py-2">{item.assets?.nama || "-"}</td>
                       <td className="px-4 py-2">{item.assets?.kategori?.name || "-"}</td>
-                      <td className="px-4 py-2 text-center">{item.jumlah}</td>
+                      <td className="px-4 py-2">{item.jumlah}</td>
                       <td className="px-4 py-2">
                         <span
                           className={`inline-block px-2 py-1 text-xs font-medium rounded-full text-white ${
@@ -274,11 +287,11 @@ export default function GuestDashboard() {
                         </span>
                       </td>
                       <td className="px-4 py-2">
-                        {new Date(item.tanggal_pinjam).toLocaleString()}
+                        {new Date(item.tanggal_pinjam).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-2">
                         {item.tanggal_kembali
-                          ? new Date(item.tanggal_kembali).toLocaleString()
+                          ? new Date(item.tanggal_kembali).toLocaleDateString()
                           : "-"}
                       </td>
                     </tr>
