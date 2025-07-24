@@ -6,6 +6,8 @@ export default function AddBarang() {
   const [nama, setNama] = useState("");
   const [kategoriId, setKategoriId] = useState("");
   const [jumlah, setJumlah] = useState(0);
+  const [keterangan, setKeterangan] = useState("");
+  const [gambar, setGambar] = useState(null); // file
   const [kategoriList, setKategoriList] = useState([]);
   const navigate = useNavigate();
 
@@ -22,11 +24,36 @@ export default function AddBarang() {
     const user = await supabase.auth.getUser();
     const user_id = user.data.user?.id;
 
+    let gambarUrl = null;
+
+    if (gambar) {
+      const fileExt = gambar.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `assets/${fileName}`;
+
+      const { data, error: uploadError } = await supabase.storage
+        .from("gambar") // <-- nama bucket
+        .upload(filePath, gambar);
+
+      if (uploadError) {
+        alert("Gagal upload gambar: " + uploadError.message);
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from("gambar")
+        .getPublicUrl(filePath);
+
+      gambarUrl = publicUrlData.publicUrl;
+    }
+
     const { error } = await supabase.from("assets").insert([
       {
         nama,
         kategori_id: kategoriId,
         jumlah,
+        keterangan,
+        gambar: gambarUrl,
         user_id,
       },
     ]);
@@ -50,16 +77,17 @@ export default function AddBarang() {
           <label className="block mb-1 font-medium">Nama Barang</label>
           <input
             type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border"
             value={nama}
             onChange={(e) => setNama(e.target.value)}
             required
           />
         </div>
+
         <div>
           <label className="block mb-1 font-medium">Kategori</label>
           <select
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border"
             value={kategoriId}
             onChange={(e) => setKategoriId(e.target.value)}
             required
@@ -72,27 +100,48 @@ export default function AddBarang() {
             ))}
           </select>
         </div>
+
         <div>
           <label className="block mb-1 font-medium">Jumlah</label>
           <input
             type="number"
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border"
             value={jumlah}
             onChange={(e) => setJumlah(parseInt(e.target.value))}
             required
           />
         </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Keterangan</label>
+          <textarea
+            className="w-full px-3 py-2 border"
+            rows="3"
+            value={keterangan}
+            onChange={(e) => setKeterangan(e.target.value)}
+          ></textarea>
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Upload Gambar</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setGambar(e.target.files[0])}
+          />
+        </div>
+
         <div className="flex gap-4">
           <button
             type="submit"
-            className="w-full px-4 py-2 bg-black text-white rounded hover:opacity-90 hover:scale-[1.02] transition-all duration-200"
+            className="w-full px-4 py-2 bg-black text-white rounded hover:opacity-90"
           >
             Simpan
           </button>
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="w-full px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 transition"
+            className="w-full px-4 py-2 bg-gray-300 text-black rounded"
           >
             Kembali
           </button>
