@@ -34,7 +34,7 @@ const GuestPeminjamanAset = React.lazy(() => import('./pages/guest/peminjaman/Pe
 const Riwayat = React.lazy(() => import('./pages/guest/peminjaman/riwayat'));
 const EditProfile = React.lazy(() => import('./pages/guest/EditProfile'));
 const GuestFAQ = React.lazy(() => import('./pages/guest/GuestFAQ'));
-const Bantuan = React.lazy(() => import('./pages/guest/laporan'));
+const Bantuan = React.lazy(() => import('./pages/guest/Laporan'));
 
 // Landing Page
 const LandingPage = React.lazy(() => import('./landing/LandingPage'));
