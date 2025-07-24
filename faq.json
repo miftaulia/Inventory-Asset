@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "question": "Bagaimana cara meminjam barang?",
+    "answer": "Masuk ke dashboard, pilih barang, dan klik tombol pinjam."
+  },
+  {
+    "id": 2,
+    "question": "Apa yang harus dilakukan jika barang rusak?",
+    "answer": "Segera laporkan ke admin melalui fitur laporan."
+  }
+]

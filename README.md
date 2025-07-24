@@ -65,4 +65,4 @@ npm run dev
 ```
 
 ## 📄 Lisensi
-MIT License © 2025 ASETRA
+MIT License © 2025 Ananta Firdaus
