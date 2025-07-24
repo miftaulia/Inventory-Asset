@@ -34,6 +34,12 @@ export default function AdminSidebar() {
           <SidebarItem icon={<Eye size={16} />} label="Lihat Sebagai Guest" to="/guest/dashboard" highlight />
         </nav>
 
+        <p className="text-gray-400 uppercase text-xs font-semibold mb-2">Akses Lain</p>
+        <nav className="space-y-1">
+        <SidebarItem icon={<Eye size={16} />} label="Lihat Sebagai Guest" to="/guest/dashboard" highlight />
+        <SidebarItem icon={<FileText size={16} />} label="Kelola FAQ" to="/admin/faq" />
+        </nav>
+
         <hr className="my-4" />
         <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 hover:text-red-700 transition text-sm">
           <LogOut size={16} /> Logout

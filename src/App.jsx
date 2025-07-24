@@ -25,6 +25,10 @@ const Kategori = React.lazy(() => import('./pages/admin/kategori/Kategori'));
 const AddKategori = React.lazy(() => import('./pages/admin/kategori/AddKategori'));
 const EditKategori = React.lazy(() => import('./pages/admin/kategori/EditKategori'));
 const KelolaUser = React.lazy(() => import('./pages/admin/kelolaUser'));
+const AdminFAQ = React.lazy(() => import('./pages/admin/AdminFAQ'));
+const GuestFAQ = React.lazy(() => import('./pages/guest/GuestFAQ'));
+
+
 
 // Guest Pages
 const GuestDashboard = React.lazy(() => import('./pages/guest/Dashboard'));
@@ -94,6 +98,8 @@ function App() {
 
           <Route path="/admin/kelola-user" element={<KelolaUser />} />
 
+          <Route path="/admin/faq" element={<AdminFAQ />} />
+
         </Route>
       )}
 
@@ -103,6 +109,14 @@ function App() {
     <Route path="/guest/peminjaman" element={<GuestPeminjamanAset />} />
     <Route path="/guest/riwayat" element={<Riwayat />} />
     <Route path="/guest/edit-profile" element={<EditProfile />} />
+    <Route
+    path="/guest/faq"
+    element={
+    <Suspense fallback={<div>Loading FAQ...</div>}>
+      <GuestFAQ />
+    </Suspense>
+  }
+/>
 
   </Route>
 )}

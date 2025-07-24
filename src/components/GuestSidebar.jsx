@@ -62,6 +62,10 @@ export default function GuestSidebar() {
           <SidebarItem icon={<Barcode size={16} />} label="Print Barcode" to="/guest/print-barcode" />
           <SidebarItem icon={<QrCode size={16} />} label="Print QR Code" to="/guest/print-qr" />
         </nav>
+         <p className="text-gray-400 uppercase text-xs font-semibold mb-2">Informasi</p>
+      <nav className="space-y-1 mb-4">
+      <SidebarItem icon={<Layers size={16} />} label="FAQ" to="/guest/faq" />
+      </nav>
 
         <p className="text-gray-400 uppercase text-xs font-semibold mb-2">Stock</p>
         <nav className="space-y-1">
